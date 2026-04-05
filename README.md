@@ -41,8 +41,16 @@ npm install
 
 ```bash
 cp backend/.env.example backend/.env
-# Modificare .env con il tuo AUTH_TOKEN
 ```
+
+Ora modifica `backend/.env` e imposta l'`AUTH_TOKEN`:
+
+```bash
+AUTH_TOKEN=una-stringa-a-scelta
+PORT=4000
+```
+
+**Cos'e l'`AUTH_TOKEN`?** — E una password che scegli tu. Puo essere qualsiasi stringa (es. `mia-password-segreta`). Serve a proteggere l'accesso alla webapp: solo chi conosce il token puo inviare prompt a Claude Code. In ambiente production usa una stringa lunga e casuale (es. `openssl rand -hex 32`).
 
 ### 4. Avviare in modalità dev
 
@@ -69,11 +77,12 @@ Vai su `http://localhost:3000`, inserisci il token auth e configura la connessio
 ### Docker
 
 ```bash
-# Build immagine backend
-docker build -t claude-code-mobile-backend ./backend
+# Modifica docker-compose.yml e sostituisci AUTH_TOKEN con la tua password
+# environment:
+#   - AUTH_TOKEN=la-tua-password-qui
 
-# Run con docker-compose
-docker compose up -d
+# Build e avvio
+docker compose up -d --build
 ```
 
 ### Docker Compose

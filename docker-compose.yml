@@ -5,7 +5,6 @@ services:
     restart: unless-stopped
     ports:
       - "4000:4000"
-    env_file:
-      - ./backend/.env
     environment:
+      - AUTH_TOKEN=la-tua-password-qui
       - NODE_ENV=production
