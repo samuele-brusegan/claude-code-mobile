@@ -109,38 +109,28 @@ export function detectToolCall(text: string): {
 } | null {
   const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
 
-  // Pattern: tool call con emoji (formato UI di Claude Code)
-  const toolEmojis: [RegExp, string][] = [
-    [/^[📖📄]\s*(Read|Reading)\s+/i, 'Read'],
-    [/^[✍️📝✏️]\s*(Edit|Editing|Save)\s+/i, 'Edit'],
-    [/^[⚙️🔧]\s*(Bash|Running)\s+/i, 'Bash'],
-    [/^[📄💾]\s*(Write|Writing|Creating)\s+/i, 'Write'],
-    [/^[🔍]\s*(Glob|Searching)\s+/i, 'Glob'],
-    [/^[🔎]\s*(Grep|Searching)\s+/i, 'Grep'],
-    [/^[🤖]\s*(Agent)\s+/i, 'Agent'],
-    [/^[💡]\s*(Skill)\s+/i, 'Skill'],
-    [/^[❓]\s*(Ask)\s+/i, 'AskUserQuestion'],
-    [/^[📓]\s*(Notebook)/i, 'NotebookEdit'],
+  // Pattern: keyword di tool call (con o senza emoji prefisso)
+  // Cerca le keyword principali — le emoji sono opzionali
+  const toolPatterns: [RegExp, string][] = [
+    [/\b(Read|Reading)\b\s+(\S+)/i, 'Read'],
+    [/\b(Edit|Editing|Save to)\b\s+(\S+)/i, 'Edit'],
+    [/\b(Bash|Running|Executing)\b\s+(\S+)/i, 'Bash'],
+    [/\b(Write|Writing|Creating)\b\s+(\S+)/i, 'Write'],
+    [/\b(Glob|Globbing)\b\s*(\S+)?/i, 'Glob'],
+    [/\b(Grep|Searching)\b\s*(\S+)?/i, 'Grep'],
+    [/\b(Agent)\b\s+(\S+)/i, 'Agent'],
+    [/\b(Skill)\b\s+(\S+)/i, 'Skill'],
+    [/\b(Ask)\b/i, 'AskUserQuestion'],
+    [/\b(Notebook)/i, 'NotebookEdit'],
   ];
 
   for (const line of lines) {
-    for (const [regex, toolName] of toolEmojis) {
+    for (const [regex, toolName] of toolPatterns) {
       const match = line.match(regex);
       if (match) {
-        const description = line.replace(regex, '').trim();
+        const description = match[2] || '';
         return { tool: toolName, description };
       }
-    }
-  }
-
-  // Fallback: pattern senza emoji (es. output raw)
-  for (const line of lines) {
-    const toolMatch = line.match(/^(?:tool|call|running):\s*(\w+)\s*[:\s]\s*(.*)?/i);
-    if (toolMatch) {
-      return {
-        tool: toolMatch[1],
-        description: toolMatch[2] || '',
-      };
     }
   }
 
