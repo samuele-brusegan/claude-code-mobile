@@ -6,9 +6,9 @@ Webapp/PWA per interagire con **Claude Code** da dispositivo mobile. Interfaccia
 
 ```
 ┌─────────────────┐     WebSocket/HTTPS     ┌──────────────────┐      SSH       ┌───────────────────┐
-│   Mobile/PWA    │ ──────────────────────►  │  Backend Node.js  │ ────────────►  │  Claude Code CLI  │
-│   (Next.js)     │ ◄────────────────────── │  (Express + WS)   │ ◄────────────  │  (server remoto)  │
-└─────────────────┘                        └──────────────────┘              └───────────────────┘
+│   Mobile/PWA    │ ◄─────────────────────► │  Backend Node.js  │ ◄────────────► │  Claude Code CLI  │
+│   (Next.js)     │                         │  (Express + WS)   │                │  (server remoto)  │
+└─────────────────┘                         └──────────────────┘                └───────────────────┘
 ```
 
 - **Frontend**: Next.js PWA con TailwindCSS — UI pulita tipo chat
@@ -18,7 +18,7 @@ Webapp/PWA per interagire con **Claude Code** da dispositivo mobile. Interfaccia
 
 ## Requisiti
 
-- **Server remoto**: Machine con Claude Code installato e SSH abilitato
+- **Server remoto**: Macchina con Claude Code installato e SSH abilitato
 - **Locale**: Node.js >= 20, npm >= 10
 - **Docker** (opzionale, per deploy production)
 
@@ -27,7 +27,7 @@ Webapp/PWA per interagire con **Claude Code** da dispositivo mobile. Interfaccia
 ### 1. Clonare il repo
 
 ```bash
-git clone https://github.com/YOUR_USER/claude-code-mobile.git
+git clone https://github.com/samuele-brusegan/claude-code-mobile.git
 cd claude-code-mobile
 ```
 
@@ -44,7 +44,7 @@ cp backend/.env.example backend/.env
 # Modificare .env con il tuo AUTH_TOKEN
 ```
 
-### 4. Avviare in modalita dev
+### 4. Avviare in modalità dev
 
 ```bash
 # Backend (porta 4000)
@@ -79,9 +79,7 @@ docker compose up -d
 ### Docker Compose
 
 Il file `docker-compose.yml` include:
-- Backend con volume per sessioni persistenti
-- Frontend buildato e servito staticamente da Express
-- Configurazione env tramite `.env`
+- Backend con configurazione tramite `.env`
 
 ### Configurazione SSH
 
@@ -90,7 +88,7 @@ Ogni sessione viene avviata configurando:
 - **Port**: porta SSH (default 22)
 - **Utente**: username SSH
 - **Autenticazione**: chiave privata o password
-- **Working directory**: directory dove Claude Code lavorera
+- **Working directory**: directory dove Claude Code lavorerà
 
 ## Struttura Progetto
 
@@ -128,7 +126,7 @@ claude-code-mobile/
 - Controlla i log del backend per errori SSH
 
 ### Output non viene parsato correttamente
-- L'output di Claude Code varia nel tempo — il parser e best-effort
+- L'output di Claude Code varia nel tempo — il parser è best-effort
 - Se noti pattern non riconosciuti, apri una issue
 
 ## License

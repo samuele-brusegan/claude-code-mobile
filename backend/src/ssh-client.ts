@@ -1,13 +1,13 @@
-import { Client, ConnectConfig, ShellOptions } from 'ssh2';
+import { Client, ConnectConfig, ClientChannel } from 'ssh2';
 import { SshConfig } from './types';
 
 /**
  * Gestisce una singola connessione SSH.
- * Espone il client raw per permettere lo spawn di PTY.
  */
 export class SshClient {
   private client: Client;
   private connected = false;
+  private stream: ClientChannel | null = null;
 
   constructor() {
     this.client = new Client();
@@ -24,10 +24,8 @@ export class SshClient {
     if (config.password) {
       connectConfig.password = config.password;
     }
-
     if (config.privateKey) {
       connectConfig.privateKey = config.privateKey;
-      // Se c'e passphrase, andrebbe gestita — per ora non supportata
     }
 
     return new Promise((resolve, reject) => {
@@ -35,9 +33,7 @@ export class SshClient {
         this.connected = true;
         resolve();
       });
-      this.client.on('error', (err) => {
-        reject(err);
-      });
+      this.client.on('error', (err) => reject(err));
       this.client.on('close', () => {
         this.connected = false;
       });
@@ -46,49 +42,56 @@ export class SshClient {
   }
 
   /**
-   * Spawn un processo in un PTY remoto.
-   * Claude Code richiede un terminale interattivo.
+   * Spawn claude in un PTY interattivo sul server remoto.
    */
   spawnPty(
     command: string,
     cwd: string,
     onData: (data: Buffer | string, isStderr?: boolean) => void,
-    onExit: (code: number) => void
-  ): { write: (data: string) => void; resize: (rows: number, cols: number) => void } {
-    const options: ShellOptions = {
-      pty: {
+    onExit?: (code: number) => void
+  ): void {
+    // Eseguiamo cd nella working directory poi il comando
+    const fullCmd = `cd ${cwd} && ${command}`;
+
+    this.client.shell(
+      {
         term: 'xterm-256color',
         cols: 160,
         rows: 40,
       },
-      env: {
-        // Env essenziali per Claude Code
-        TERM: 'xterm-256color',
-        CLAUDE_CODE_SHELL: 'echo', // Evita che Claude apra la vera shell
-      },
-    };
+      (err, stream) => {
+        if (err || !stream) {
+          onData(Buffer.from(`SSH shell error: ${err?.message}\n`), true);
+          return;
+        }
 
-    return this.client.exec(`${command}`, { pty: true, cwd }, (err, stream) => {
-      if (err) {
-        onData(Buffer.from(`SSH exec error: ${err.message}\n`), true);
-        return;
+        this.stream = stream;
+
+        stream.on('data', (data) => onData(data, false));
+        stream.on('stderr', (data) => onData(data, true));
+        stream.on('close', (code) => {
+          this.stream = null;
+          onExit?.(code || 0);
+        });
+
+        // Invia il comando claude alla shell remota
+        stream.write(`${fullCmd}\n`);
       }
+    );
+  }
 
-      stream.on('data', (data) => onData(data, false));
-      stream.on('stderr', (data) => onData(data, true));
-      stream.on('close', (code) => onExit(code || 0));
-    });
+  write(input: string): void {
+    if (this.stream) {
+      this.stream.write(input);
+    }
   }
 
   /**
-   * Esegue un comando senza PTY (per check preliminari).
+   * Esegue un comando one-shot senza PTY.
    */
-  exec(command: string, cwd?: string): Promise<string> {
+  exec(command: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      const options: { cwd?: string } = {};
-      if (cwd) options.cwd = cwd;
-
-      this.client.exec(command, options, (err, stream) => {
+      this.client.exec(command, (err, stream) => {
         if (err) return reject(err);
 
         let output = '';
@@ -107,6 +110,8 @@ export class SshClient {
   }
 
   close(): void {
+    this.stream?.end();
+    this.stream = null;
     this.client.end();
     this.connected = false;
   }

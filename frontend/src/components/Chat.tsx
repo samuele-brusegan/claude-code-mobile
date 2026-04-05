@@ -204,17 +204,22 @@ export default function Chat() {
     [ws]
   );
 
-  const handleConfigSubmit = useCallback(() => {
-    if (!ws) return;
-    ws.createSession({
-      host: config.host,
-      port: parseInt(config.port) || 22,
-      username: config.username,
-      password: config.password || undefined,
-      privateKey: config.privateKey || undefined,
-      workingDirectory: config.workingDirectory || '.',
-    });
-  }, [ws, config]);
+  const handleConfigSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!ws) return;
+      setShowConfig(false);
+      ws.createSession({
+        host: config.host,
+        port: parseInt(config.port) || 22,
+        username: config.username,
+        password: config.password || undefined,
+        privateKey: config.privateKey || undefined,
+        workingDirectory: config.workingDirectory || '.',
+      });
+    },
+    [ws, config]
+  );
 
   const handleCancel = useCallback(() => {
     ws?.sendCancel();
@@ -283,7 +288,8 @@ export default function Chat() {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {showConfig ? (
-          <div
+          <form
+            onSubmit={handleConfigSubmit}
             className="rounded-xl p-6 space-y-4"
             style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
           >
@@ -357,7 +363,7 @@ export default function Chat() {
             >
               Avvia sessione Claude Code
             </button>
-          </div>
+          </form>
         ) : (
           messages.map((msg) => (
             <div

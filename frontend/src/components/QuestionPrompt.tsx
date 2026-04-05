@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { QuestionPrompt as QuestionPromptType } from '@/lib/types';
 
-function QuestionPrompt({ question, onAnswer }: { question: QuestionPromptType; onAnswer: (answer: string) => void }) {
+export function QuestionPrompt({ question, onAnswer }: { question: QuestionPromptType; onAnswer: (answer: string) => void }) {
   const [textAnswer, setTextAnswer] = useState('');
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 

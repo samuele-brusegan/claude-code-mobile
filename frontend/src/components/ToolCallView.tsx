@@ -23,7 +23,7 @@ const toolColors: Record<string, string> = {
   Write: '#34d399',
 };
 
-function ToolCallView({ toolCall: tc }: { toolCall: ToolCallType }) {
+export function ToolCallView({ toolCall: tc }: { toolCall: ToolCallType }) {
   const [expanded, setExpanded] = useState(false);
 
   const icon = toolIcons[tc.tool] || '⚡';

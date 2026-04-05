@@ -34,8 +34,8 @@ export class SessionManager {
     return Array.from(this.sessions.values()).map((s) => ({
       id: s.id,
       status: s.status,
-      workingDirectory: s['config'].workingDirectory,
-      createdAt: (s as any).createdAt || Date.now(),
+      workingDirectory: (s as any).config.workingDirectory,
+      createdAt: s.createdAt,
     }));
   }
 

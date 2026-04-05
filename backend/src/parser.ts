@@ -17,11 +17,16 @@ export function stripAnsi(text: string): string {
   return text.replace(ANSI_REGEX, '');
 }
 
-/** Rimuove i caratteri non stampabili (mantienenndo newlines e tab) */
+/**
+ * Rimuove gli ANSI escape codes ma mantiene Unicode (emoji, caratteri speciali).
+ * Claude Code usa emoji per i tool call, non possiamo strapparli.
+ */
 export function cleanOutput(text: string): string {
   return text
+    .replace(ANSI_REGEX, '')
     .replace(/\r/g, '')
-    .replace(/[^\x20-\x7E\n\t]/g, '')
+    .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '')
+    .replace(/\x1b[^[\]]/g, '')
     .trim();
 }
 
