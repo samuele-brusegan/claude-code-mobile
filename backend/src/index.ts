@@ -63,7 +63,7 @@ app.get('/api/sessions', authMiddleware(AUTH_TOKEN), (_req, res) => {
 
 // Chiudi sessione
 app.delete('/api/sessions/:sessionId', authMiddleware(AUTH_TOKEN), (req, res) => {
-  const { sessionId } = req.params;
+  const sessionId = Array.isArray(req.params.sessionId) ? req.params.sessionId[0] : req.params.sessionId;
   sessionManager.closeSession(sessionId);
   res.json({ status: 'closed', sessionId });
 });

@@ -11,3 +11,10 @@
 - Componenti: ToolCallView, QuestionPrompt
 - Dockerfile backend + docker-compose.yml
 - README, DECISION_LOG, documentazione
+
+### Fixed
+- ssh-client.ts: usa shell() invece di exec() per PTY interattivo corretto
+- parser.ts: cleanOutput mantiene emoji per tool call detection
+- session.ts: semplificato, rimosso stream management manuale
+- Componenti: aggiunti export mancanti su ToolCallView e QuestionPrompt
+- Chat: form submit corretto con preventDefault

@@ -50,7 +50,6 @@ export class SshClient {
     onData: (data: Buffer | string, isStderr?: boolean) => void,
     onExit?: (code: number) => void
   ): void {
-    // Eseguiamo cd nella working directory poi il comando
     const fullCmd = `cd ${cwd} && ${command}`;
 
     this.client.shell(
@@ -67,9 +66,9 @@ export class SshClient {
 
         this.stream = stream;
 
-        stream.on('data', (data) => onData(data, false));
-        stream.on('stderr', (data) => onData(data, true));
-        stream.on('close', (code) => {
+        stream.on('data', (data: Buffer) => onData(data, false));
+        stream.on('stderr', (data: Buffer) => onData(data, true));
+        stream.on('close', (code: number) => {
           this.stream = null;
           onExit?.(code || 0);
         });
@@ -95,9 +94,9 @@ export class SshClient {
         if (err) return reject(err);
 
         let output = '';
-        stream.on('data', (data) => (output += data.toString()));
-        stream.on('stderr', (data) => (output += data.toString()));
-        stream.on('close', (code) => {
+        stream.on('data', (data: Buffer) => (output += data.toString()));
+        stream.on('stderr', (data: Buffer) => (output += data.toString()));
+        stream.on('close', (code: number) => {
           if (code === 0) resolve(output);
           else reject(new Error(`Command exited with code ${code}: ${output}`));
         });
