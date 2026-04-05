@@ -54,9 +54,12 @@ export class ClaudeSession extends EventEmitter {
 
   private spawnClaude(): void {
     const cwd = this.config.workingDirectory || '.';
+    // Costruisci il comando: claude --model <model> se specificato
+    const model = this.config.model;
+    const cmd = model ? `claude --model "${model}"` : 'claude';
 
     this.ssh.spawnPty(
-      'claude',
+      cmd,
       cwd,
       (data: Buffer | string) => {
         const text = typeof data === 'string' ? data : data.toString();

@@ -40,7 +40,7 @@ app.get('/api/auth', authMiddleware(AUTH_TOKEN), (_req, res) => {
 
 // Inizializza sessione: lancia Claude su server remoto via SSH
 app.post('/api/sessions', authMiddleware(AUTH_TOKEN), (req, res) => {
-  const { host, port, username, password, privateKey, workingDirectory } = req.body;
+  const { host, port, username, password, privateKey, workingDirectory, model } = req.body;
 
   if (!host || !username) {
     res.status(400).json({ error: 'host and username are required' });

@@ -11,6 +11,7 @@ export interface SshConfig {
 export interface SessionConfig {
   ssh: SshConfig;
   workingDirectory: string;
+  model?: string;
 }
 
 // Stato di una sessione

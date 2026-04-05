@@ -27,6 +27,7 @@ export default function Chat() {
     password: '',
     privateKey: '',
     workingDirectory: '.',
+    model: '',
   });
 
   // Auth check on mount
@@ -216,6 +217,7 @@ export default function Chat() {
         password: config.password || undefined,
         privateKey: config.privateKey || undefined,
         workingDirectory: config.workingDirectory || '.',
+        model: config.model || undefined,
       });
     },
     [ws, config]
@@ -349,6 +351,13 @@ export default function Chat() {
               value={config.workingDirectory}
               onChange={(e) => setConfig({ ...config, workingDirectory: e.target.value })}
               className="w-full rounded-xl px-4 py-3 outline-none"
+              style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text)' }}
+            />
+            <input
+              placeholder="Modello (es. qwen/qwen3.6-plus:free, vuoto = default)"
+              value={config.model}
+              onChange={(e) => setConfig({ ...config, model: e.target.value })}
+              className="w-full rounded-xl px-4 py-3 outline-none font-mono text-sm"
               style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text)' }}
             />
 

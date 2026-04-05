@@ -58,6 +58,7 @@ export function setupWsHandler(
                   privateKey: config.privateKey,
                 },
                 workingDirectory: config.workingDirectory || '.',
+                model: config.model || undefined,
               });
 
               if (session) {
