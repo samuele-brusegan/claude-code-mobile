@@ -12,4 +12,6 @@ Traccia decisioni architetturali e modifiche.
 | Nessun terminale visibile (GUI nativa) | UX mobile, leggibilita | xterm.js embedded |
 | Parser ANSI lato backend | Ridurre payload, strutturare eventi prima del WS | Parsare lato frontend |
 | Token auth semplice | LAN/VPN, setup minimo | OAuth, GitHub login |
-| Next.js PWA | Add to home screen, offline-ready base | SPA React, Svelte |
+| Next.js con `output: 'export'` | Frontend statico servito da Express | SSR, standalone |
+| Rimuosso next-pwa | Incompatibile con Next.js 15 + Turbopack | Workbox webpack |
+| `client.shell()` invece di `client.exec()` | Claude Code richiede shell interattiva con PTY | exec diretto |

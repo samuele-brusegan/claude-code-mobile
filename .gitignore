@@ -1,6 +1,9 @@
 node_modules/
 dist/
 .next/
+frontend/out/
+frontend/.next/
 .env
 .env.local
 *.tsbuildinfo
+frontend/next-env.d.ts

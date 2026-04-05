@@ -6,6 +6,8 @@ import { WebSocketServer } from 'ws';
 import { authMiddleware } from './auth';
 import { setupWsHandler } from './ws-handler';
 import { SessionManager } from './sessions';
+import * as fs from 'fs';
+import * as path from 'path';
 
 dotenv.config();
 
@@ -22,12 +24,14 @@ if (!AUTH_TOKEN) {
 app.use(cors());
 app.use(express.json());
 
+const sessionManager = new SessionManager();
+
+// --- API routes (prima dei file statici) ---
+
 // Health check
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
-
-const sessionManager = new SessionManager();
 
 // HTTP auth endpoint — valida il token e restituisce le sessioni attive
 app.get('/api/auth', authMiddleware(AUTH_TOKEN), (_req, res) => {
@@ -71,6 +75,16 @@ app.delete('/api/sessions/:sessionId', authMiddleware(AUTH_TOKEN), (req, res) =>
 // WebSocket setup
 const wss = new WebSocketServer({ server, path: '/ws' });
 setupWsHandler(wss, sessionManager, AUTH_TOKEN);
+
+// --- Static files — frontend buildato (DOPO le API routes) ---
+const frontendOut = path.join(__dirname, '..', 'frontend', 'out');
+if (fs.existsSync(frontendOut)) {
+  app.use(express.static(frontendOut));
+  // SPA fallback: tutte le route non-API tornano index.html
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(frontendOut, 'index.html'));
+  });
+}
 
 server.listen(PORT, () => {
   console.log(`[backend] listening on :${PORT}`);

@@ -1,15 +1,7 @@
-import withPWA from 'next-pwa';
-
-const withPWAConfig = withPWA({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // static export per servirlo dal backend Express
   output: 'export',
 };
 
-export default withPWAConfig(nextConfig);
+export default nextConfig;
